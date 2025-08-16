@@ -217,7 +217,7 @@ export default function App(){
               <CardTitle className="flex items-center gap-2 text-3xl"><Rocket className="w-7 h-7"/>Inside Large Language Models</CardTitle>
             </CardHeader>
             <CardContent className="text-slate-700 dark:text-slate-300 space-y-4">
-              <p className="text-lg"><b>Welcome to an interactive deep-dive!</b> This workshop covers everything from neural network basics to production deployment of Large Language Models.</p>
+              <p className="text-lg"><b>Welcome to an interactive deep-dive!</b> This KT session covers everything from neural network basics to production deployment of Large Language Models.</p>
               
               <div className="grid md:grid-cols-2 gap-6 mt-6">
                 <div>
@@ -245,7 +245,7 @@ export default function App(){
               </div>
               
               <p className="text-sm bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg">
-                💡 <b>Tip:</b> Toggle "Show Advanced Details" above for deeper technical insights, formulas, and implementation notes throughout the workshop.
+                💡 <b>Tip:</b> Toggle "Show Advanced Details" above for deeper technical insights, formulas, and implementation notes throughout the KT session.
               </p>
             </CardContent>
           </Card>
@@ -1465,7 +1465,7 @@ export default function App(){
               </div>
               
               <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-2xl">
-                <h4 className="font-semibold mb-3 text-center">🎯 Workshop Completion</h4>
+                <h4 className="font-semibold mb-3 text-center">🎯 KT Session Completion</h4>
                 <p className="text-sm text-center text-slate-600 dark:text-slate-400 mb-4">
                   Congratulations! You've explored the fundamentals of Large Language Models, from neural networks to production deployment. 
                 </p>
@@ -1476,7 +1476,7 @@ export default function App(){
                   </Button>
                   <Button variant="secondary" onClick={() => window.location.reload()} className="gap-2">
                     <Rocket className="w-4 h-4" />
-                    Restart Workshop
+                    Restart KT Session
                   </Button>
                 </div>
               </div>
@@ -1487,7 +1487,7 @@ export default function App(){
         <footer className="text-center text-xs text-slate-500 py-8 border-t border-slate-200 dark:border-slate-800">
           <p className="mb-2">🧠 <b>LLM Interactive KT Session</b> - Enhanced Edition</p>
           <p>Built for comprehensive learning • Interactive demos and real-world examples</p>
-          <p className="mt-2">Toggle "Show Advanced Details" for deeper technical insights throughout the workshop</p>
+          <p className="mt-2">Toggle "Show Advanced Details" for deeper technical insights throughout the KT session</p>
         </footer>
       </main>
     </div>
