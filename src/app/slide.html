@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Interactive Workshop - Enhanced Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .slideshow-container {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            display: none;
+            width: 90%;
+            max-width: 1200px;
+            padding: 2rem;
+            text-align: center;
+            animation: slideIn 0.6s ease-in-out;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .slide h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .slide h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #ffd700;
+        }
+
+        .slide p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .slide ul {
+            text-align: left;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .slide li {
+            margin-bottom: 0.5rem;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: #ffd700;
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .interactive-demo {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .demo-card {
+            background: rgba(255,255,255,0.15);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .demo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .attention-demo {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin: 2rem 0;
+        }
+
+        .attention-cell {
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .attention-cell:hover {
+            transform: scale(1.1);
+        }
+
+        .formula {
+            background: rgba(0,0,0,0.3);
+            padding: 1rem;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            margin: 1rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .formula::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shine 2s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .key-insight {
+            background: rgba(255,215,0,0.2);
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            text-align: left;
+            margin-top: 2rem;
+        }
+
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .activation-chart, .temperature-chart, .cost-chart, .neural-viz {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            color: #333;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 250px;
+            position: relative;
+        }
+
+        .chart-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .function-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .control-btn.active {
+            background: #ffd700;
+            color: #333;
+        }
+
+        .slider-container {
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .probability-bars {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1rem;
+            height: 100px;
+            align-items: end;
+        }
+
+        .prob-bar {
+            width: 60px;
+            background: #667eea;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.3s ease, background-color 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            padding-bottom: 5px;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .prob-bar:hover {
+            background: #5a67d8;
+        }
+
+        .prob-label {
+            position: absolute;
+            bottom: -25px;
+            font-size: 0.8rem;
+            color: #333;
+        }
+
+        .cost-bars {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 2rem;
+            height: 200px;
+            align-items: end;
+        }
+
+        .cost-bar {
+            width: 80px;
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            padding-bottom: 10px;
+            color: white;
+            font-weight: bold;
+            transition: height 0.5s ease, transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .cost-bar:hover {
+            transform: scale(1.05);
+        }
+
+        .cost-label {
+            position: absolute;
+            bottom: -35px;
+            font-size: 0.9rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* New Neural Network Visualization */
+        .neural-network {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 200px;
+            margin: 2rem 0;
+        }
+
+        .layer {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .neuron {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .neuron:hover {
+            background: #ffd700;
+            color: #333;
+            transform: scale(1.2);
+        }
+
+        .connection {
+            stroke: #999;
+            stroke-width: 2;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .connection.active {
+            stroke: #ffd700;
+            stroke-width: 3;
+            opacity: 1;
+        }
+
+        /* Model Comparison Table */
+        .model-comparison {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            color: #333;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .comparison-table th {
+            background-color: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .comparison-table tr:hover {
+            background-color: rgba(102, 126, 234, 0.1);
+        }
+
+        /* Security Threat Visualization */
+        .threat-matrix {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .threat-card {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #ef4444;
+            border-radius: 10px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .threat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .threat-severity {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .severity-high {
+            background: #ef4444;
+            color: white;
+        }
+
+        .severity-medium {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .severity-low {
+            background: #10b981;
+            color: white;
+        }
+
+        /* Enhanced Mobile Responsive */
+        @media (max-width: 768px) {
+            .slide h1 { font-size: 2rem; }
+            .slide h2 { font-size: 1.8rem; }
+            .slide h3 { font-size: 1.5rem; }
+            .slide p, .slide ul { font-size: 1rem; }
+            .two-column { grid-template-columns: 1fr; gap: 2rem; }
+            .attention-demo { grid-template-columns: repeat(3, 1fr); }
+            .threat-matrix { grid-template-columns: 1fr; }
+            .demo-grid { grid-template-columns: 1fr; }
+            .neural-network { flex-direction: column; height: auto; gap: 2rem; }
+            .layer { flex-direction: row; }
+        }
+
+        /* Fullscreen button */
+        .fullscreen-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 10px 15px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .fullscreen-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Styles for new slides */
+        .generation-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 1rem 0;
+        }
+
+        .prompt-section, .prediction-section {
+            margin-bottom: 2rem;
+        }
+
+        .text-display {
+            background: rgba(0,0,0,0.3);
+            padding: 1rem;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            color: #ffd700;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+        }
+
+        .prediction-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .prediction-token {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .prediction-token:hover {
+            background: rgba(255,255,255,0.25);
+            border-color: #ffd700;
+            transform: translateY(-2px);
+        }
+
+        .prediction-token.selected {
+            background: rgba(255,215,0,0.3);
+            border-color: #ffd700;
+        }
+
+        .token-text {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .token-prob {
+            font-size: 0.9rem;
+            color: #90EE90;
+            margin-bottom: 0.5rem;
+        }
+
+        .prob-bar-mini {
+            height: 4px;
+            background: #667eea;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .generation-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .generation-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        /* Context window styles */
+        .context-window-demo {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            color: #333;
+            margin: 1rem 0;
+        }
+
+        .context-timeline {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .timeline-track {
+            position: relative;
+            height: 80px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            overflow: hidden;
+        }
+
+        .context-window-indicator {
+            position: absolute;
+            height: 100%;
+            background: rgba(102, 126, 234, 0.2);
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            transition: all 0.5s ease;
+            left: 1rem;
+            width: calc(8 * 60px);
+        }
+
+        .token-sequence {
+            display: flex;
+            gap: 5px;
+            z-index: 2;
+            position: relative;
+        }
+
+        .timeline-token {
+            width: 60px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .timeline-token.in-context {
+            background: #667eea;
+            color: white;
+        }
+
+        .timeline-token.out-of-context {
+            background: #ccc;
+            color: #666;
+            opacity: 0.5;
+        }
+
+        .timeline-token.current {
+            background: #ffd700;
+            color: #333;
+            border-color: #333;
+        }
+
+        .timeline-token.future {
+            background: #e0e0e0;
+            color: #999;
+            font-size: 1.2rem;
+        }
+
+        .window-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            .prediction-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .timeline-token {
+                width: 50px;
+                font-size: 0.7rem;
+            }
+            
+            .context-window-indicator {
+                width: calc(8 * 50px + 35px);
+            }
+            
+            .generation-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="slide-counter" id="slideCounter">1 / 19</div>
+    <button class="fullscreen-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen">⛶</button>
+    
+    <div class="slideshow-container">
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <div class="icon">🧠</div>
+            <h1>Inside Large Language Models</h1>
+            <h3>Interactive Workshop & Deep Dive</h3>
+            <p>From Neural Networks to Production Deployment</p>
+            <p style="margin-top: 2rem; font-size: 1rem; opacity: 0.8;">
+                A comprehensive journey through the architecture, training, and real-world applications of LLMs
+            </p>
+        </div>
+
+        <!-- Slide 2: What You'll Learn -->
+        <div class="slide">
+            <h2>🎯 What You'll Learn</h2>
+            <div class="two-column">
+                <div>
+                    <h3>Core Concepts</h3>
+                    <ul>
+                        <li>Neural network fundamentals</li>
+                        <li>Transformer architecture</li>
+                        <li>Attention mechanisms</li>
+                        <li>Training methodologies</li>
+                        <li>Security & alignment</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Practical Applications</h3>
+                    <ul>
+                        <li>Prompt engineering</li>
+                        <li>Production deployment</li>
+                        <li>Cost optimization</li>
+                        <li>Developer workflows</li>
+                        <li>Future directions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: LLM Fundamentals -->
+        <div class="slide">
+            <h2>📚 LLM Fundamentals</h2>
+            <div class="key-insight">
+                <p><strong>Key Insight:</strong> LLMs are autoregressive neural networks trained to predict the next token given previous context</p>
+            </div>
+            <div class="two-column">
+                <div>
+                    <h3>What are LLMs?</h3>
+                    <ul>
+                        <li>Sophisticated autocomplete systems</li>
+                        <li>Billions to trillions of parameters</li>
+                        <li>Trained on vast text datasets</li>
+                        <li>Learn statistical patterns in language</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>How They Process Text</h3>
+                    <ul>
+                        <li>Tokenization → subword units</li>
+                        <li>Embedding → dense vectors</li>
+                        <li>Positional encoding → word order</li>
+                        <li>Transformer layers → refinement</li>
+                        <li>Output projection → probabilities</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Neural Network Visualization -->
+        <div class="slide">
+            <h2>🔬 Neural Network Foundation</h2>
+            <div class="key-insight">
+                <p><strong>Universal Approximation Theorem:</strong> Neural networks can approximate any continuous function with enough hidden units</p>
+            </div>
+            <div class="neural-viz">
+                <h3>Interactive Neural Network</h3>
+                <div class="neural-network">
+                    <div class="layer">
+                        <div class="neuron" onclick="activateNeuron(this)">I1</div>
+                        <div class="neuron" onclick="activateNeuron(this)">I2</div>
+                        <div class="neuron" onclick="activateNeuron(this)">I3</div>
+                    </div>
+                    <div class="layer">
+                        <div class="neuron" onclick="activateNeuron(this)">H1</div>
+                        <div class="neuron" onclick="activateNeuron(this)">H2</div>
+                        <div class="neuron" onclick="activateNeuron(this)">H3</div>
+                        <div class="neuron" onclick="activateNeuron(this)">H4</div>
+                    </div>
+                    <div class="layer">
+                        <div class="neuron" onclick="activateNeuron(this)">O1</div>
+                        <div class="neuron" onclick="activateNeuron(this)">O2</div>
+                    </div>
+                </div>
+                <p style="margin-top: 1rem; font-size: 0.9rem;">Click neurons to see activation patterns</p>
+            </div>
+            <div class="formula">
+                output = activation(input × weights + bias)
+            </div>
+        </div>
+
+        <!-- Slide 5: Activation Functions -->
+        <div class="slide">
+            <h2>⚡ Activation Functions</h2>
+            <p>Introduce non-linearity, enabling complex pattern learning</p>
+            <div class="activation-chart">
+                <h3>Interactive Activation Functions</h3>
+                <div class="chart-canvas">
+                    <svg class="chart-svg" id="activationSvg" viewBox="0 0 400 250">
+                        <!-- Chart will be drawn here by JavaScript -->
+                    </svg>
+                </div>
+                <div class="function-controls">
+                    <button class="control-btn active" onclick="showActivation('relu')">ReLU</button>
+                    <button class="control-btn" onclick="showActivation('gelu')">GELU</button>
+                    <button class="control-btn" onclick="showActivation('sigmoid')">Sigmoid</button>
+                    <button class="control-btn" onclick="showActivation('tanh')">Tanh</button>
+                    <button class="control-btn" onclick="showActivation('swish')">Swish</button>
+                </div>
+            </div>
+            <div class="demo-grid">
+                <div class="demo-card">
+                    <h4>ReLU</h4>
+                    <p>max(0,x) - Simple and efficient</p>
+                    <p style="font-size: 0.9rem; opacity: 0.8;">No vanishing gradients for positive inputs</p>
+                </div>
+                <div class="demo-card">
+                    <h4>GELU</h4>
+                    <p>Smooth ReLU variant used in transformers</p>
+                    <p style="font-size: 0.9rem; opacity: 0.8;">Better gradient flow than ReLU</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Model Comparison -->
+        <div class="slide">
+            <h2>🏆 Model Comparison</h2>
+            <div class="model-comparison">
+                <h3>Leading LLMs (2024-2025)</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Parameters</th>
+                            <th>Context Length</th>
+                            <th>Key Strengths</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>GPT-4</strong></td>
+                            <td>~1.8T</td>
+                            <td>128k tokens</td>
+                            <td>General reasoning, coding</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Claude 3.5 Sonnet</strong></td>
+                            <td>Unknown</td>
+                            <td>200k tokens</td>
+                            <td>Writing, analysis, safety</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Llama 3.1</strong></td>
+                            <td>405B</td>
+                            <td>128k tokens</td>
+                            <td>Open source, multilingual</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Gemini Ultra</strong></td>
+                            <td>Unknown</td>
+                            <td>1M tokens</td>
+                            <td>Multimodal, long context</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Slide 7: Transformer Architecture -->
+        <div class="slide">
+            <h2>🏗️ Transformer Architecture</h2>
+            <div class="two-column">
+                <div>
+                    <h3>Key Components</h3>
+                    <ul>
+                        <li><strong>Self-Attention:</strong> Token relationships</li>
+                        <li><strong>Multi-Layer Perceptron:</strong> Knowledge storage</li>
+                        <li><strong>Layer Normalization:</strong> Training stability</li>
+                        <li><strong>Residual Connections:</strong> Gradient flow</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Why It Works</h3>
+                    <ul>
+                        <li>Parallel processing during training</li>
+                        <li>Long-range dependency modeling</li>
+                        <li>Efficient scaling with data/compute</li>
+                        <li>Effective transfer learning</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="formula">
+                Attention(Q,K,V) = softmax(QK^T/√d_k)V
+            </div>
+        </div>
+
+        <!-- Slide 8: Attention Mechanism -->
+        <div class="slide">
+            <h2>🎯 The Attention Mechanism</h2>
+            <p>The heart of transformers - how tokens "attend" to each other</p>
+            <div class="interactive-demo">
+                <h3>Attention Weights Example: "The cat sat on the mat"</h3>
+                <div class="attention-demo">
+                    <div>
+                        <div class="attention-cell" style="background: rgba(59, 130, 246, 0.05); color: #1f2937;" onclick="highlightAttention(this, 0.05)">0.05</div>
+                        <div style="font-size: 0.8rem; margin-top: 0.5rem;">The</div>
+                    </div>
+                    <div>
+                        <div class="attention-cell" style="background: rgba(59, 130, 246, 0.8); color: white;" onclick="highlightAttention(this, 0.80)">0.80</div>
+                        <div style="font-size: 0.8rem; margin-top: 0.5rem;">cat</div>
+                    </div>
+                    <div>
+                        <div class="attention-cell" style="background: rgba(59, 130, 246, 0.1); color: #1f2937;" onclick="highlightAttention(this, 0.10)">0.10</div>
+                        <div style="font-size: 0.8rem; margin-top: 0.5rem;">sat</div>
+                    </div>
+                    <div>
+                        <div class="attention-cell" style="background: rgba(59, 130, 246, 0.02); color: #1f2937;" onclick="highlightAttention(this, 0.02)">0.02</div>
+                        <div style="font-size: 0.8rem; margin-top: 0.5rem;">on</div>
+                    </div>
+                    <div>
+                        <div class="attention-cell" style="background: rgba(59, 130, 246, 0.02); color: #1f2937;" onclick="highlightAttention(this, 0.02)">0.02</div>
+                        <div style="font-size: 0.8rem; margin-top: 0.5rem;">the</div>
+                    </div>
+                    <div>
+                        <div class="attention-cell" style="background: rgba(59, 130, 246, 0.01); color: #1f2937;" onclick="highlightAttention(this, 0.01)">0.01</div>
+                        <div style="font-size: 0.8rem; margin-top: 0.5rem;">mat</div>
+                    </div>
+                </div>
+                <p style="margin-top: 1rem;">Click cells to see attention patterns. Darker blue = higher attention weight from "cat"</p>
+            </div>
+            <div class="key-insight">
+                <p><strong>Multi-Head Attention:</strong> Real transformers use 8-96 heads in parallel, each learning different relationship types</p>
+            </div>
+        </div>
+
+        <!-- NEW SLIDE: Next Word Prediction Overview -->
+        <div class="slide">
+            <h2>🔮 Next Word Prediction: The Core Mechanism</h2>
+            <div class="key-insight">
+                <p><strong>Autoregressive Generation:</strong> LLMs generate text one token at a time, using all previous tokens as context</p>
+            </div>
+            <div class="two-column">
+                <div>
+                    <h3>How It Works</h3>
+                    <ul>
+                        <li>Start with initial context (prompt)</li>
+                        <li>Model outputs probability distribution</li>
+                        <li>Sample next token from distribution</li>
+                        <li>Add token to context, repeat</li>
+                        <li>Continue until stopping condition</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Key Properties</h3>
+                    <ul>
+                        <li>Each prediction depends on ALL previous tokens</li>
+                        <li>Context window limits how far back it "remembers"</li>
+                        <li>Temperature controls randomness vs consistency</li>
+                        <li>Stopping tokens end generation</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="formula">
+                P(token_t | context) = softmax(Transformer(context))
+            </div>
+            <div class="interactive-demo">
+                <h3>Simple Example</h3>
+                <p style="font-size: 1.1rem; font-family: monospace; background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 10px;">
+                    <span style="color: #ffd700;">Context:</span> "The weather today is"<br>
+                    <span style="color: #90EE90;">Model predicts:</span> "sunny" (45%), "cloudy" (25%), "rainy" (20%), "cold" (10%)
+                </p>
+            </div>
+        </div>
+
+        <!-- NEW SLIDE: Interactive Step-by-Step Generation -->
+        <div class="slide">
+            <h2>⚡ Interactive Text Generation</h2>
+            <p>Watch how an LLM builds text token by token</p>
+            <div class="interactive-demo">
+                <div class="generation-container">
+                    <div class="prompt-section">
+                        <h3>Initial Prompt</h3>
+                        <div class="text-display" id="currentContext">The cat sat on</div>
+                    </div>
+                    
+                    <div class="prediction-section">
+                        <h3>Next Token Predictions</h3>
+                        <div class="prediction-grid" id="predictionGrid">
+                            <div class="prediction-token" data-token="the" data-prob="0.35" onclick="selectToken(this)">
+                                <div class="token-text">the</div>
+                                <div class="token-prob">35%</div>
+                                <div class="prob-bar-mini" style="width: 35%"></div>
+                            </div>
+                            <div class="prediction-token" data-token="a" data-prob="0.25" onclick="selectToken(this)">
+                                <div class="token-text">a</div>
+                                <div class="token-prob">25%</div>
+                                <div class="prob-bar-mini" style="width: 25%"></div>
+                            </div>
+                            <div class="prediction-token" data-token="his" data-prob="0.15" onclick="selectToken(this)">
+                                <div class="token-text">his</div>
+                                <div class="token-prob">15%</div>
+                                <div class="prob-bar-mini" style="width: 15%"></div>
+                            </div>
+                            <div class="prediction-token" data-token="that" data-prob="0.12" onclick="selectToken(this)">
+                                <div class="token-text">that</div>
+                                <div class="token-prob">12%</div>
+                                <div class="prob-bar-mini" style="width: 12%"></div>
+                            </div>
+                            <div class="prediction-token" data-token="my" data-prob="0.08" onclick="selectToken(this)">
+                                <div class="token-text">my</div>
+                                <div class="token-prob">8%</div>
+                                <div class="prob-bar-mini" style="width: 8%"></div>
+                            </div>
+                            <div class="prediction-token" data-token="our" data-prob="0.05" onclick="selectToken(this)">
+                                <div class="token-text">our</div>
+                                <div class="token-prob">5%</div>
+                                <div class="prob-bar-mini" style="width: 5%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="generation-controls">
+                        <button class="control-btn" onclick="resetGeneration()">🔄 Reset</button>
+                        <button class="control-btn" onclick="autoGenerate()" id="autoBtn">▶️ Auto Generate</button>
+                        <button class="control-btn" onclick="stepGenerate()">👆 Step</button>
+                    </div>
+                    
+                    <div class="generation-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Tokens Generated:</span>
+                            <span class="stat-value" id="tokenCount">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Context Length:</span>
+                            <span class="stat-value" id="contextLength">4</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">
+                Click on predicted tokens to select them, or use Auto Generate to see the process in action
+            </p>
+        </div>
+
+        <!-- NEW SLIDE: Context Window and Memory -->
+        <div class="slide">
+            <h2>🧠 Context Window & Memory Limitations</h2>
+            <div class="interactive-demo">
+                <h3>Context Window Visualization</h3>
+                <div class="context-window-demo">
+                    <div class="context-timeline" id="contextTimeline">
+                        <div class="timeline-header">
+                            <span>Token Position</span>
+                            <span>Context Window (8 tokens)</span>
+                        </div>
+                        <div class="timeline-track">
+                            <div class="context-window-indicator" id="contextWindow"></div>
+                            <div class="token-sequence" id="tokenSequence">
+                                <div class="timeline-token in-context" data-pos="1">The</div>
+                                <div class="timeline-token in-context" data-pos="2">quick</div>
+                                <div class="timeline-token in-context" data-pos="3">brown</div>
+                                <div class="timeline-token in-context" data-pos="4">fox</div>
+                                <div class="timeline-token in-context" data-pos="5">jumps</div>
+                                <div class="timeline-token in-context" data-pos="6">over</div>
+                                <div class="timeline-token in-context" data-pos="7">the</div>
+                                <div class="timeline-token in-context current" data-pos="8">lazy</div>
+                                <div class="timeline-token future" data-pos="9">?</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="window-controls">
+                        <button class="control-btn" onclick="simulateGeneration()">▶️ Simulate Generation</button>
+                        <button class="control-btn" onclick="resetContextWindow()">🔄 Reset</button>
+                        <div class="slider-container">
+                            <label>Window Size:</label>
+                            <input type="range" class="slider" id="windowSizeSlider" min="4" max="12" step="1" value="8" oninput="updateWindowSize()">
+                            <span id="windowSizeValue">8</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="demo-grid" style="margin-top: 2rem;">
+                <div class="demo-card">
+                    <h4>🔍 What's In Context</h4>
+                    <ul style="font-size: 0.9rem;">
+                        <li>Recent tokens (within window)</li>
+                        <li>Full attention to all tokens</li>
+                        <li>Position-aware encoding</li>
+                        <li>Rich contextual understanding</li>
+                    </ul>
+                </div>
+                <div class="demo-card">
+                    <h4>❌ What's Forgotten</h4>
+                    <ul style="font-size: 0.9rem;">
+                        <li>Tokens beyond window</li>
+                        <li>Early conversation context</li>
+                        <li>Previous document sections</li>
+                        <li>Long-term dependencies</li>
+                    </ul>
+                </div>
+                <div class="demo-card">
+                    <h4>📈 Real-World Sizes</h4>
+                    <ul style="font-size: 0.9rem;">
+                        <li>GPT-3.5: 4K tokens (~3K words)</li>
+                        <li>GPT-4: 8K-128K tokens</li>
+                        <li>Claude: 200K tokens</li>
+                        <li>Gemini: 1M+ tokens</li>
+                    </ul>
+                </div>
+                <div class="demo-card">
+                    <h4>⚡ Performance Trade-offs</h4>
+                    <ul style="font-size: 0.9rem;">
+                        <li>Longer context = slower inference</li>
+                        <li>Quadratic attention complexity</li>
+                        <li>Higher memory usage</li>
+                        <li>Increased computational cost</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Training LLMs -->
+        <div class="slide">
+            <h2>🚀 Training Large Language Models</h2>
+            <div class="two-column">
+                <div>
+                    <h3>Pre-training</h3>
+                    <ul>
+                        <li>Learn language from massive datasets</li>
+                        <li>Next-token prediction objective</li>
+                        <li>Trillions of tokens, months of training</li>
+                        <li>Costs millions to hundreds of millions</li>
+                    </ul>
+                    <div class="formula" style="font-size: 0.9rem;">
+                        Loss = -∑ log P(token_t | tokens_1...t-1)
+                    </div>
+                </div>
+                <div>
+                    <h3>Fine-tuning & Alignment</h3>
+                    <ul>
+                        <li><strong>SFT:</strong> Instruction following</li>
+                        <li><strong>RLHF:</strong> Human preference learning</li>
+                        <li><strong>DPO:</strong> Direct preference optimization</li>
+                        <li><strong>Constitutional AI:</strong> Self-critique</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Temperature & Sampling -->
+        <div class="slide">
+            <h2>🌡️ Temperature & Generation Control</h2>
+            <div class="temperature-chart">
+                <h3>Interactive Temperature Effects</h3>
+                <div class="slider-container">
+                    <label>Temperature:</label>
+                    <input type="range" class="slider" id="tempSlider" min="0.1" max="2.0" step="0.1" value="1.0" oninput="updateTemperature()">
+                    <span id="tempValue">1.0</span>
+                </div>
+                <div class="probability-bars" id="probBars">
+                    <div class="prob-bar" style="height: 60px;">0.3<div class="prob-label">the</div></div>
+                    <div class="prob-bar" style="height: 80px;">0.4<div class="prob-label">cat</div></div>
+                    <div class="prob-bar" style="height: 40px;">0.2<div class="prob-label">dog</div></div>
+                    <div class="prob-bar" style="height: 20px;">0.1<div class="prob-label">bird</div></div>
+                </div>
+                <p style="margin-top: 2rem; font-size: 0.9rem;">
+                    Adjust temperature to see how it affects token probability distribution
+                </p>
+            </div>
+            <div class="demo-grid">
+                <div class="demo-card">
+                    <h4>Low Temperature (0.1-0.3)</h4>
+                    <p>Deterministic, reliable, always picks most likely tokens</p>
+                </div>
+                <div class="demo-card">
+                    <h4>High Temperature (1.5+)</h4>
+                    <p>Creative but potentially incoherent</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Enhanced Security & Safety -->
+        <div class="slide">
+            <h2>🛡️ Security & Safety Challenges</h2>
+            <div class="threat-matrix">
+                <div class="threat-card" onclick="showThreatDetails('injection')">
+                    <h4>Prompt Injection</h4>
+                    <span class="threat-severity severity-high">High</span>
+                    <p style="font-size: 0.9rem; margin-top: 0.5rem;">Malicious instruction override</p>
+                </div>
+                <div class="threat-card" onclick="showThreatDetails('exfiltration')">
+                    <h4>Data Exfiltration</h4>
+                    <span class="threat-severity severity-high">High</span>
+                    <p style="font-size: 0.9rem; margin-top: 0.5rem;">Sensitive info leakage</p>
+                </div>
+                <div class="threat-card" onclick="showThreatDetails('jailbreak')">
+                    <h4>Jailbreaking</h4>
+                    <span class="threat-severity severity-medium">Medium</span>
+                    <p style="font-size: 0.9rem; margin-top: 0.5rem;">Safety bypass attempts</p>
+                </div>
+                <div class="threat-card" onclick="showThreatDetails('hallucination')">
+                    <h4>Hallucinations</h4>
+                    <span class="threat-severity severity-medium">Medium</span>
+                    <p style="font-size: 0.9rem; margin-top: 0.5rem;">False but plausible outputs</p>
+                </div>
+            </div>
+            <div class="key-insight">
+                <p><strong>Key Challenge:</strong> LLMs process instructions and data in the same text stream, making attacks hard to detect</p>
+            </div>
+            <div class="demo-grid">
+                <div class="demo-card">
+                    <h4>🛡️ Defense Strategies</h4>
+                    <ul style="font-size: 0.9rem;">
+                        <li>Input validation & sanitization</li>
+                        <li>Output filtering & monitoring</li>
+                        <li>Constitutional AI safeguards</li>
+                        <li>Regular red team exercises</li>
+                    </ul>
+                </div>
+                <div class="demo-card">
+                    <h4>📊 Risk Assessment</h4>
+                    <ul style="font-size: 0.9rem;">
+                        <li>Continuous threat modeling</li>
+                        <li>Automated safety testing</li>
+                        <li>Human oversight systems</li>
+                        <li>Incident response plans</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Prompt Engineering -->
+        <div class="slide">
+            <h2>✍️ Effective Prompt Engineering</h2>
+            <div class="interactive-demo">
+                <h3>Proven Patterns</h3>
+                <div class="demo-grid">
+                    <div class="demo-card">
+                        <h4>System Role</h4>
+                        <p style="font-size: 0.9rem;">"You are an expert Python developer with 10 years of experience..."</p>
+                    </div>
+                    <div class="demo-card">
+                        <h4>Few-Shot Learning</h4>
+                        <p style="font-size: 0.9rem;">Provide examples of input-output pairs before your actual query</p>
+                    </div>
+                    <div class="demo-card">
+                        <h4>Chain-of-Thought</h4>
+                        <p style="font-size: 0.9rem;">"Let's think step by step..." encourages detailed reasoning</p>
+                    </div>
+                    <div class="demo-card">
+                        <h4>Self-Verification</h4>
+                        <p style="font-size: 0.9rem;">"Review your answer and identify any potential errors"</p>
+                    </div>
+                </div>
+            </div>
+            <div class="key-insight">
+                <p><strong>Pro Tip:</strong> Combine multiple techniques for best results. Be specific, provide context, and iterate on your prompts.</p>
+            </div>
+        </div>
+
+        <!-- Slide 13: Production Deployment -->
+        <div class="slide">
+            <h2>🚀 Production Deployment</h2>
+            <div class="cost-chart">
+                <h3>Monthly Cost Analysis by Scale</h3>
+                <div class="cost-bars">
+                    <div class="cost-bar" style="height: 30px; background: #10b981;" onclick="showCostBreakdown('startup')">$150<div class="cost-label">Startup</div></div>
+                    <div class="cost-bar" style="height: 100px; background: #f59e0b;" onclick="showCostBreakdown('scaleup')">$1,500<div class="cost-label">Scale-up</div></div>
+                    <div class="cost-bar" style="height: 180px; background: #ef4444;" onclick="showCostBreakdown('enterprise')">$15,000<div class="cost-label">Enterprise</div></div>
+                </div>
+                <p style="margin-top: 3rem; font-size: 0.9rem;">
+                    Based on typical API usage: 1M tokens/month → 10M → 100M+ tokens (Click bars for details)
+                </p>
+            </div>
+            <div class="demo-grid">
+                <div class="demo-card">
+                    <h4>💰 Cost Optimization</h4>
+                    <ul style="font-size: 0.9rem;">
+                        <li>Cache frequent responses</li>
+                        <li>Use smaller models for simple tasks</li>
+                        <li>Implement request batching</li>
+                        <li>Smart prompt compression</li>
+                    </ul>
+                </div>
+                <div class="demo-card">
+                    <h4>⚡ Performance</h4>
+                    <ul style="font-size: 0.9rem;">
+                        <li>P95 latency: 200-2000ms</li>
+                        <li>99.9%+ uptime requirements</li>
+                        <li>Load balancing & failover</li>
+                        <li>Real-time monitoring</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Current State -->
+        <div class="slide">
+            <h2>🌟 Current State (2024-2025)</h2>
+            <div class="two-column">
+                <div>
+                    <h3>✅ Capabilities</h3>
+                    <ul>
+                        <li>Near-human performance on many benchmarks</li>
+                        <li>Multimodal understanding (text, image, audio)</li>
+                        <li>Tool integration and function calling</li>
+                        <li>Code generation across languages</li>
+                        <li>Complex reasoning and planning</li>
+                        <li>Long-context processing (1M+ tokens)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>⚠️ Limitations</h3>
+                    <ul>
+                        <li>Hallucinations and reliability issues</li>
+                        <li>Context window limitations</li>
+                        <li>No persistent memory across sessions</li>
+                        <li>Brittle on adversarial inputs</li>
+                        <li>Inconsistent multi-step reasoning</li>
+                        <li>High computational costs</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="key-insight">
+                <p><strong>Scaling Law:</strong> Performance follows predictable patterns, but with diminishing returns and increasing costs</p>
+            </div>
+        </div>
+
+        <!-- Slide 15: The Future -->
+        <div class="slide">
+            <h2>🔮 The Future of LLMs</h2>
+            <div class="interactive-demo">
+                <h3>Near-term (1-2 years)</h3>
+                <div class="demo-grid">
+                    <div class="demo-card">
+                        <h4>🚀 Efficiency</h4>
+                        <ul style="font-size: 0.9rem;">
+                            <li>Mixture of Experts (MoE)</li>
+                            <li>Model compression techniques</li>
+                            <li>Custom hardware optimization</li>
+                            <li>Edge deployment capabilities</li>
+                        </ul>
+                    </div>
+                    <div class="demo-card">
+                        <h4>🧠 Extended Memory</h4>
+                        <ul style="font-size: 0.9rem;">
+                            <li>10M+ token contexts</li>
+                            <li>Hierarchical processing</li>
+                            <li>Persistent agent memory</li>
+                            <li>External knowledge integration</li>
+                        </ul>
+                    </div>
+                    <div class="demo-card">
+                        <h4>🤖 Autonomous Agents</h4>
+                        <ul style="font-size: 0.9rem;">
+                            <li>Multi-step task execution</li>
+                            <li>Real-world API integration</li>
+                            <li>Continuous learning systems</li>
+                            <li>Human-AI collaboration tools</li>
+                        </ul>
+                    </div>
+                    <div class="demo-card">
+                        <h4>🔬 Scientific Applications</h4>
+                        <ul style="font-size: 0.9rem;">
+                            <li>Automated research assistance</li>
+                            <li>Protein folding & drug discovery</li>
+                            <li>Climate modeling & optimization</li>
+                            <li>Educational personalization</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="key-insight">
+                <p><strong>Medium-term Vision:</strong> Unified multimodal models with autonomous agent capabilities and seamless human-AI collaboration</p>
+            </div>
+        </div>
+
+        <!-- Slide 16: Conclusion -->
+        <div class="slide">
+            <div class="icon">🎓</div>
+            <h2>Workshop Complete!</h2>
+            <h3>Key Takeaways</h3>
+            <ul style="max-width: 900px; margin: 2rem auto;">
+                <li><strong>Architecture:</strong> Transformers revolutionized NLP through attention and parallelization</li>
+                <li><strong>Scale:</strong> Massive datasets and compute enable emergent capabilities</li>
+                <li><strong>Training:</strong> Pre-training + fine-tuning + alignment create useful AI systems</li>
+                <li><strong>Security:</strong> New challenges require proactive defense strategies</li>
+                <li><strong>Deployment:</strong> Production requires careful consideration of cost, latency, and safety</li>
+                <li><strong>Future:</strong> Continued scaling, efficiency improvements, and new capabilities ahead</li>
+            </ul>
+            <div style="margin-top: 3rem;">
+                <p style="font-size: 1.1rem; opacity: 0.9;">
+                    🚀 You now have a solid foundation in Large Language Models!
+                </p>
+                <p style="font-size: 1rem; opacity: 0.8; margin-top: 1rem;">
+                    Keep learning, experimenting, and building amazing AI applications!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn">← Previous</button>
+        <button class="nav-btn" id="nextBtn">Next →</button>
+    </div>
+
+    <script>
+        // Slideshow functionality
+        var currentSlide = 0;
+        var slides = document.querySelectorAll('.slide');
+        var totalSlides = slides.length;
+
+        function updateSlideCounter() {
+            document.getElementById('slideCounter').textContent = (currentSlide + 1) + ' / ' + totalSlides;
+            document.getElementById('progressBar').style.width = ((currentSlide + 1) / totalSlides) * 100 + '%';
+        }
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = n;
+            if (currentSlide >= totalSlides) currentSlide = 0;
+            if (currentSlide < 0) currentSlide = totalSlides - 1;
+            slides[currentSlide].classList.add('active');
+            updateSlideCounter();
+            updateNavButtons();
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        function updateNavButtons() {
+            var prevBtn = document.getElementById('prevBtn');
+            var nextBtn = document.getElementById('nextBtn');
+            
+            if (currentSlide === 0) {
+                prevBtn.disabled = true;
+            } else {
+                prevBtn.disabled = false;
+            }
+            
+            if (currentSlide === totalSlides - 1) {
+                nextBtn.disabled = true;
+            } else {
+                nextBtn.disabled = false;
+            }
+        }
+
+        // Enhanced activation function visualization
+        function drawActivationFunction(type) {
+            const svg = document.getElementById('activationSvg');
+            svg.innerHTML = '';
+            
+            // Create axes
+            const axisGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            axisGroup.setAttribute('stroke', '#666');
+            axisGroup.setAttribute('stroke-width', '2');
+            
+            // X-axis
+            const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            xAxis.setAttribute('x1', '50');
+            xAxis.setAttribute('y1', '125');
+            xAxis.setAttribute('x2', '350');
+            xAxis.setAttribute('y2', '125');
+            axisGroup.appendChild(xAxis);
+            
+            // Y-axis
+            const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            yAxis.setAttribute('x1', '200');
+            yAxis.setAttribute('y1', '25');
+            yAxis.setAttribute('x2', '200');
+            yAxis.setAttribute('y2', '225');
+            axisGroup.appendChild(yAxis);
+            
+            svg.appendChild(axisGroup);
+            
+            // Draw function
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke', '#667eea');
+            path.setAttribute('stroke-width', '3');
+            
+            let pathData = 'M ';
+            for (let x = -5; x <= 5; x += 0.1) {
+                let y;
+                switch(type) {
+                    case 'relu':
+                        y = Math.max(0, x);
+                        break;
+                    case 'sigmoid':
+                        y = 1 / (1 + Math.exp(-x));
+                        y = y * 2 - 1; // Scale to -1,1 range
+                        break;
+                    case 'tanh':
+                        y = Math.tanh(x);
+                        break;
+                    case 'gelu':
+                        y = 0.5 * x * (1 + Math.tanh(Math.sqrt(2/Math.PI) * (x + 0.044715 * Math.pow(x, 3))));
+                        break;
+                    case 'swish':
+                        y = x / (1 + Math.exp(-x));
+                        break;
+                }
+                
+                const screenX = 200 + x * 30;
+                const screenY = 125 - y * 40;
+                pathData += screenX + ',' + screenY + ' L ';
+            }
+            
+            path.setAttribute('d', pathData.slice(0, -3));
+            svg.appendChild(path);
+            
+            // Add labels
+            const titleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            titleText.setAttribute('x', '200');
+            titleText.setAttribute('y', '20');
+            titleText.setAttribute('text-anchor', 'middle');
+            titleText.setAttribute('fill', '#333');
+            titleText.setAttribute('font-size', '16');
+            titleText.setAttribute('font-weight', 'bold');
+            titleText.textContent = type.toUpperCase() + ' Activation Function';
+            svg.appendChild(titleText);
+        }
+
+        function showActivation(type) {
+            // Update button states
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Draw the function
+            drawActivationFunction(type);
+        }
+
+        // Temperature control
+        function updateTemperature() {
+            const temp = parseFloat(document.getElementById('tempSlider').value);
+            document.getElementById('tempValue').textContent = temp.toFixed(1);
+            
+            const baseProbabilities = [0.3, 0.4, 0.2, 0.1];
+            const bars = document.getElementById('probBars').children;
+            
+            // Apply temperature scaling
+            let scaledProbs = baseProbabilities.map(p => Math.pow(p, 1/temp));
+            const sum = scaledProbs.reduce((a, b) => a + b, 0);
+            scaledProbs = scaledProbs.map(p => p / sum);
+            
+            // Update bars
+            for (let i = 0; i < bars.length; i++) {
+                const height = scaledProbs[i] * 200;
+                bars[i].style.height = height + 'px';
+                bars[i].textContent = scaledProbs[i].toFixed(2);
+            }
+        }
+
+        // Neural network interaction
+        function activateNeuron(neuron) {
+            // Reset all neurons
+            document.querySelectorAll('.neuron').forEach(n => {
+                n.style.background = '#667eea';
+                n.style.color = 'white';
+            });
+            
+            // Activate clicked neuron
+            neuron.style.background = '#ffd700';
+            neuron.style.color = '#333';
+            
+            // Show activation propagation (simplified)
+            setTimeout(() => {
+                const neurons = document.querySelectorAll('.neuron');
+                neurons.forEach((n, index) => {
+                    if (n !== neuron && Math.random() > 0.5) {
+                        n.style.background = '#ff6b6b';
+                        setTimeout(() => {
+                            n.style.background = '#667eea';
+                        }, 1000);
+                    }
+                });
+            }, 300);
+        }
+
+        // Attention visualization
+        function highlightAttention(cell, weight) {
+            // Reset all cells
+            document.querySelectorAll('.attention-cell').forEach(c => {
+                c.style.transform = 'scale(1)';
+            });
+            
+            // Highlight selected cell
+            cell.style.transform = 'scale(1.2)';
+            
+            // Show explanation
+            const explanation = `This token has ${(weight * 100).toFixed(1)}% attention weight from "cat"`;
+            // You could add a tooltip or status display here
+        }
+
+        // Threat details
+        function showThreatDetails(threatType) {
+            const threats = {
+                'injection': 'Prompt injection involves malicious users inserting commands that override the intended behavior.',
+                'exfiltration': 'Data exfiltration occurs when LLMs inadvertently reveal sensitive training data or user information.',
+                'jailbreak': 'Jailbreaking attempts bypass safety constraints through creative prompt engineering.',
+                'hallucination': 'Hallucinations are confident but factually incorrect outputs that can mislead users.'
+            };
+            
+            alert(threats[threatType] || 'Threat information not available.');
+        }
+
+        // Cost breakdown
+        function showCostBreakdown(scale) {
+            const costs = {
+                'startup': 'Startup: $150/month\n• 1M tokens/month\n• Basic support\n• Standard models',
+                'scaleup': 'Scale-up: $1,500/month\n• 10M tokens/month\n• Priority support\n• Advanced models',
+                'enterprise': 'Enterprise: $15,000/month\n• 100M+ tokens/month\n• 24/7 support\n• Custom models'
+            };
+            
+            alert(costs[scale] || 'Cost information not available.');
+        }
+
+        // Fullscreen functionality
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Event listeners
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            }
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+            if (e.key === 'f' || e.key === 'F') {
+                toggleFullscreen();
+            }
+        });
+
+        // JavaScript for new slides functionality
+
+        // Generation state
+        let generationState = {
+            baseContext: "The cat sat on",
+            currentContext: "The cat sat on",
+            tokenCount: 0,
+            isGenerating: false,
+            generationScenarios: [
+                {
+                    context: "The cat sat on",
+                    predictions: [
+                        {token: "the", prob: 0.35},
+                        {token: "a", prob: 0.25},
+                        {token: "his", prob: 0.15},
+                        {token: "that", prob: 0.12},
+                        {token: "my", prob: 0.08},
+                        {token: "our", prob: 0.05}
+                    ]
+                },
+                {
+                    context: "The cat sat on the",
+                    predictions: [
+                        {token: "mat", prob: 0.42},
+                        {token: "couch", prob: 0.18},
+                        {token: "chair", prob: 0.15},
+                        {token: "floor", prob: 0.12},
+                        {token: "bed", prob: 0.08},
+                        {token: "table", prob: 0.05}
+                    ]
+                },
+                {
+                    context: "The cat sat on the mat",
+                    predictions: [
+                        {token: "and", prob: 0.25},
+                        {token: ".", prob: 0.20},
+                        {token: "while", prob: 0.15},
+                        {token: "in", prob: 0.12},
+                        {token: "looking", prob: 0.10},
+                        {token: "peacefully", prob: 0.18}
+                    ]
+                },
+                {
+                    context: "The cat sat on the mat and",
+                    predictions: [
+                        {token: "watched", prob: 0.22},
+                        {token: "slept", prob: 0.20},
+                        {token: "looked", prob: 0.18},
+                        {token: "purred", prob: 0.15},
+                        {token: "waited", prob: 0.12},
+                        {token: "relaxed", prob: 0.13}
+                    ]
+                }
+            ],
+            currentScenario: 0
+        };
+
+        function selectToken(tokenElement) {
+            // Remove previous selections
+            document.querySelectorAll('.prediction-token').forEach(el => el.classList.remove('selected'));
+            
+            // Select current token
+            tokenElement.classList.add('selected');
+            
+            // Get token and add to context
+            const token = tokenElement.dataset.token;
+            generationState.currentContext += " " + token;
+            generationState.tokenCount++;
+            
+            // Update display
+            updateContextDisplay();
+            
+            // Move to next scenario if available
+            if (generationState.currentScenario < generationState.generationScenarios.length - 1) {
+                generationState.currentScenario++;
+                setTimeout(() => {
+                    updatePredictions();
+                }, 500);
+            } else {
+                // End of generation
+                setTimeout(() => {
+                    document.getElementById('predictionGrid').innerHTML = '<p style="text-align: center; color: #ffd700;">Generation complete! 🎉</p>';
+                }, 500);
+            }
+        }
+
+        function updateContextDisplay() {
+            document.getElementById('currentContext').textContent = generationState.currentContext;
+            document.getElementById('tokenCount').textContent = generationState.tokenCount;
+            document.getElementById('contextLength').textContent = generationState.currentContext.split(' ').length;
+        }
+
+        function updatePredictions() {
+            const scenario = generationState.generationScenarios[generationState.currentScenario];
+            const grid = document.getElementById('predictionGrid');
+            
+            grid.innerHTML = '';
+            
+            scenario.predictions.forEach(pred => {
+                const tokenEl = document.createElement('div');
+                tokenEl.className = 'prediction-token';
+                tokenEl.dataset.token = pred.token;
+                tokenEl.dataset.prob = pred.prob;
+                tokenEl.onclick = () => selectToken(tokenEl);
+                
+                tokenEl.innerHTML = `
+                    <div class="token-text">${pred.token}</div>
+                    <div class="token-prob">${Math.round(pred.prob * 100)}%</div>
+                    <div class="prob-bar-mini" style="width: ${pred.prob * 100}%"></div>
+                `;
+                
+                grid.appendChild(tokenEl);
+            });
+        }
+
+        function resetGeneration() {
+            generationState.currentContext = generationState.baseContext;
+            generationState.tokenCount = 0;
+            generationState.currentScenario = 0;
+            generationState.isGenerating = false;
+            
+            updateContextDisplay();
+            updatePredictions();
+            
+            document.getElementById('autoBtn').innerHTML = '▶️ Auto Generate';
+            document.querySelectorAll('.prediction-token').forEach(el => el.classList.remove('selected'));
+        }
+
+        function stepGenerate() {
+            if (generationState.currentScenario < generationState.generationScenarios.length) {
+                // Auto-select the highest probability token
+                const tokens = document.querySelectorAll('.prediction-token');
+                if (tokens.length > 0) {
+                    selectToken(tokens[0]); // First token is usually highest probability
+                }
+            }
+        }
+
+        function autoGenerate() {
+            if (generationState.isGenerating) {
+                generationState.isGenerating = false;
+                document.getElementById('autoBtn').innerHTML = '▶️ Auto Generate';
+                return;
+            }
+            
+            generationState.isGenerating = true;
+            document.getElementById('autoBtn').innerHTML = '⏸️ Pause';
+            
+            function generateStep() {
+                if (!generationState.isGenerating) return;
+                
+                stepGenerate();
+                
+                if (generationState.currentScenario < generationState.generationScenarios.length) {
+                    setTimeout(generateStep, 2000);
+                } else {
+                    generationState.isGenerating = false;
+                    document.getElementById('autoBtn').innerHTML = '▶️ Auto Generate';
+                }
+            }
+            
+            generateStep();
+        }
+
+        // Context window functionality
+        let contextWindowState = {
+            windowSize: 8,
+            currentPosition: 8,
+            tokens: ['The', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog', 'sleeps', 'under', 'a', 'tree'],
+            isAnimating: false
+        };
+
+        function updateWindowSize() {
+            const newSize = parseInt(document.getElementById('windowSizeSlider').value);
+            contextWindowState.windowSize = newSize;
+            document.getElementById('windowSizeValue').textContent = newSize;
+            updateContextWindow();
+        }
+
+        function updateContextWindow() {
+            const windowEl = document.getElementById('contextWindow');
+            const sequenceEl = document.getElementById('tokenSequence');
+            
+            // Update window indicator
+            windowEl.style.width = `calc(${contextWindowState.windowSize} * 60px)`;
+            
+            // Update tokens
+            sequenceEl.innerHTML = '';
+            
+            for (let i = 0; i < Math.min(12, contextWindowState.tokens.length); i++) {
+                const tokenEl = document.createElement('div');
+                tokenEl.className = 'timeline-token';
+                tokenEl.dataset.pos = i + 1;
+                tokenEl.textContent = contextWindowState.tokens[i];
+                
+                const relativePos = i - (contextWindowState.currentPosition - contextWindowState.windowSize);
+                
+                if (i < contextWindowState.currentPosition - contextWindowState.windowSize) {
+                    tokenEl.classList.add('out-of-context');
+                } else if (i < contextWindowState.currentPosition) {
+                    tokenEl.classList.add('in-context');
+                } else if (i === contextWindowState.currentPosition) {
+                    tokenEl.classList.add('current');
+                    tokenEl.textContent = '?';
+                } else {
+                    tokenEl.classList.add('future');
+                    tokenEl.textContent = '?';
+                }
+                
+                sequenceEl.appendChild(tokenEl);
+            }
+        }
+
+        function simulateGeneration() {
+            if (contextWindowState.isAnimating) return;
+            
+            contextWindowState.isAnimating = true;
+            contextWindowState.currentPosition = contextWindowState.windowSize;
+            
+            function animateStep() {
+                if (contextWindowState.currentPosition >= contextWindowState.tokens.length) {
+                    contextWindowState.isAnimating = false;
+                    return;
+                }
+                
+                // Add the "predicted" token
+                const currentToken = contextWindowState.tokens[contextWindowState.currentPosition];
+                const questionMarks = document.querySelectorAll('.timeline-token.current');
+                if (questionMarks.length > 0) {
+                    questionMarks[0].textContent = currentToken;
+                }
+                
+                // Move window forward
+                setTimeout(() => {
+                    contextWindowState.currentPosition++;
+                    updateContextWindow();
+                    
+                    if (contextWindowState.currentPosition < contextWindowState.tokens.length) {
+                        setTimeout(animateStep, 1500);
+                    } else {
+                        contextWindowState.isAnimating = false;
+                    }
+                }, 1000);
+            }
+            
+            updateContextWindow();
+            setTimeout(animateStep, 500);
+        }
+
+        function resetContextWindow() {
+            contextWindowState.currentPosition = contextWindowState.windowSize;
+            contextWindowState.isAnimating = false;
+            updateContextWindow();
+        }
+
+        // Initialize new slide functionality when slides are shown
+        function initializePredictionSlides() {
+            updateContextDisplay();
+            updatePredictions();
+            updateContextWindow();
+        }
+
+        // Call initialization when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add a small delay to ensure all elements are rendered
+            setTimeout(initializePredictionSlides, 100);
+        });
+
+        // Initialize
+        updateSlideCounter();
+        updateNavButtons();
+        drawActivationFunction('relu');
+        updateTemperature();
+    </script>
+</body>
+</html>

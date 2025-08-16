@@ -1,37 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is a **React component** that builds an **interactive workshop for Large Language Models**. It uses libraries like:
 
-## Getting Started
+* `react`
+* `recharts`
+* `lucide-react`
+* `@/components/ui/...` (shadcn/ui components, which need Tailwind + shadcn setup)
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### ✅ To run it locally:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **Make sure you have Node.js installed** (v18+ recommended).
+   Check:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+   ```bash
+   node -v
+   npm -v
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Install dependencies** used in your file:
 
-## Learn More
+   ```bash
+   npm install recharts lucide-react @radix-ui/react-tabs @radix-ui/react-switch
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+If needed, install **shadcn/ui** following [shadcn setup](https://ui.shadcn.com/docs/installation) (it generates the `@/components/ui/...` components you see in your file).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Run the dev server**:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```bash
+   npm run dev
+   ```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# fundamentals-of-llm
+   Then open [http://localhost:3000](http://localhost:3000).
