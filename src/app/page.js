@@ -189,7 +189,7 @@ export default function App(){
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Brain className="w-6 h-6" />
-            <span className="font-semibold">LLM Interactive Workshop</span>
+            <span className="font-semibold">LLM Interactive KT Session</span>
             <span className="text-xs px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">Enhanced</span>
           </div>
           <div className="flex items-center gap-4">
@@ -197,6 +197,13 @@ export default function App(){
               <Label htmlFor="advanced">Show Advanced Details</Label>
               <Switch id="advanced" checked={showAdvanced} onCheckedChange={setShowAdvanced} />
             </div>
+            <Button
+              onClick={() => window.open('/slide.html', '_blank', 'noopener,noreferrer')}
+              variant="secondary"
+              size="sm"
+            >
+              Open Slides
+            </Button>
             <Button onClick={()=>window.print()} variant="secondary" size="sm">Print/Save PDF</Button>
           </div>
         </div>
@@ -1478,7 +1485,7 @@ export default function App(){
         </section>
 
         <footer className="text-center text-xs text-slate-500 py-8 border-t border-slate-200 dark:border-slate-800">
-          <p className="mb-2">🧠 <b>LLM Interactive Workshop</b> - Enhanced Edition</p>
+          <p className="mb-2">🧠 <b>LLM Interactive KT Session</b> - Enhanced Edition</p>
           <p>Built for comprehensive learning • Interactive demos and real-world examples</p>
           <p className="mt-2">Toggle "Show Advanced Details" for deeper technical insights throughout the workshop</p>
         </footer>
