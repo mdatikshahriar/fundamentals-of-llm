@@ -204,6 +204,13 @@ export default function App(){
             >
               Open Slides
             </Button>
+            <Button
+              onClick={() => window.open('/speaker-note', '_blank', 'noopener,noreferrer')}
+              variant="secondary"
+              size="sm"
+            >
+              Speaker Notes
+            </Button>
             <Button onClick={()=>window.print()} variant="secondary" size="sm">Print/Save PDF</Button>
           </div>
         </div>
