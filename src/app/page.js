@@ -205,7 +205,7 @@ export default function App(){
               Open Slides
             </Button>
             <Button
-              onClick={() => window.open('/speaker-note', '_blank', 'noopener,noreferrer')}
+              onClick={() => window.open('/speaker-note.html', '_blank', 'noopener,noreferrer')}
               variant="secondary"
               size="sm"
             >
